@@ -257,10 +257,10 @@ let s = {
     left:
     {
         val: 2,
-        right: { 
-            val: 2, 
-            right: { val: 6666, right: null, left: null }, 
-            left: { val: 777777, right: null, left: null } 
+        right: {
+            val: 2,
+            right: { val: 6666, right: null, left: null },
+            left: { val: 777777, right: null, left: null }
         },
         left: { val: 1666666, right: null, left: null }
     }
@@ -280,7 +280,7 @@ let s = {
 // };
 
 var invertTree = function (root) {
-    if(root === null) return root
+    if (root === null) return root
     let leftroot = invertTree(root.right)
     let rightroot = invertTree(root.left)
     root.left = leftroot
@@ -299,7 +299,7 @@ var judgeCircle = function (moves) {
     let lrcount = 0
     let udcount = 0
     moves.split('').forEach(res => {
-        switch(res) {
+        switch (res) {
             case 'R':
                 lrcount++
                 break;
@@ -323,22 +323,375 @@ var judgeCircle = function (moves) {
  * 解题思路：
  * 
  *  1. 为了避免冲突，我们使用两个变量来控制，一个是控制左右，一个是控制上下
- *  2 最后同时判断这两个变量是否为0
+ *  2. 最后同时判断这两个变量是否为0
  */
 
 
 
 // 1051. 高度检查器
 var heightChecker = function (heights) {
+    let newObj = {}
+    let newArr = []
+    for (let i = 0; i <= heights.length - 1; i++) {
+        if (newObj[heights[i]]) {
+            newObj[heights[i]].push(heights[i])
+        } else {
+            newObj[heights[i]] = []
+            newObj[heights[i]].push(heights[i])
+        }
+    }
+    for (let i in newObj) {
+        newArr.push(...newObj[i])
+    }
     let count = 0
     for (let i = 0; i <= heights.length - 1; i++) {
-        for (let j = i + 1; i <= heights.length - 1; i++) {
-            if (heights[j] > heights[i]) {
-                count++
-            }
+        if (heights[i] !== newArr[i]) {
+            count++
         }
     }
     return count
 };
 
-console.log(heightChecker([1, 1, 4, 2, 1, 3]))
+var heightChecker = function (heights) {
+    let height = Array.from(heights);
+    let arr = heights.sort(function (x, y) {
+        return x - y
+    })
+    let times = 0;
+    arr.forEach((item, index) => {
+        if (arr[index] !== height[index]) { times++ }
+    })
+    return times
+};
+
+// console.log(heightChecker([1, 1, 4, 2, 1, 3]))
+
+/**
+ * 解题思路： 
+ * 
+ * 1. 主要是利用的数组排序
+ * 2. 排序成功后，对比两个数组的不同之处
+ * 3. 即可得出答案
+ */
+
+
+// 104. 二叉树的最大深度
+let p = {
+    val: 3,
+    right:
+    {
+        val: 20,
+        right:
+        {
+            val: 7,
+            right: null,
+            left: null
+        },
+        left:
+        {
+            val: 15,
+            right: null,
+            left: null
+        }
+    },
+    left:
+    {
+        val: 9,
+        right: null,
+        left: null
+    }
+}
+
+
+let g = {
+    val: -8,
+    right: { val: 7, right: null, left: null },
+    left:
+    {
+        val: -6,
+        right: null,
+        left: { val: 6, right: [], left: null }
+    }
+}
+var maxDepth = function (root) {
+    if (root == null) {
+        return 0;
+    } else {
+        let left = maxDepth(root.left);
+        let right = maxDepth(root.right);
+        return Math.max(left, right) + 1;
+    }
+};
+
+
+// console.log(maxDepth(g))
+
+
+/**
+ * 解题思路：
+ *  
+ * 1. 计算二叉树的最大深度，
+ * 2. 算出左树和右树的最大深度，进行比较取值，再把跟节点加上
+ */
+
+function transform(tranvalue) {
+    let Company = ''
+    let prefix = ''
+    let last = tranvalue.length >= 5 ? 4 : (tranvalue.length == 3 ? 0 : 3)
+    let count = 0
+    switch (tranvalue.length) {
+        case 7:
+            Company = '万'
+            prefix = tranvalue[0] + tranvalue[1] + tranvalue[2]
+            break;
+        case 6:
+            Company = '万'
+            prefix = tranvalue[0] + tranvalue[1]
+            break;
+        case 5:
+            Company = '万'
+            prefix = tranvalue[0]
+            break;
+        case 4:
+            Company = '千'
+            prefix = tranvalue[0]
+            break;
+        case 3:
+            Company = ''
+            prefix = tranvalue
+            break;
+        default:
+            Company = '0'
+            prefix = tranvalue[0]
+
+    }
+    let Quota = ''
+    for (let i = tranvalue.length - last; i <= tranvalue.length - 1; i++) {         // 4 - 3
+        if (tranvalue[i] >= 1) {
+            count++
+            if (count <= 1) {
+                Quota += '.' + tranvalue[i]
+            } else {
+                Quota += tranvalue[i]
+            }
+        } else {
+            Quota += ''
+        }
+    }
+    return prefix + Quota + Company
+}
+// console.log(transform("3300"));
+
+
+
+// 111. 二叉树的最小深度
+var minDepth = function (root) {
+    if (root == null) {
+        return 0
+    }
+    if (root.left == null && root.right != null) {
+        return minDepth(root.right) + 1
+    }
+    if (root.right == null && root.left != null) {
+        return minDepth(root.left) + 1
+    }
+    let left = minDepth(root.left)
+    let right = minDepth(root.right)
+    return Math.min(left, right) + 1
+};
+
+
+/**
+ * 解题思路：
+ * 
+ * 1. 最小深度是指根节点到叶子节点之间为null的节点
+ * 2. 为了计算空，我们需要排除非空的节点
+ * 3. 如果左树为空，我们深层遍历计算右树
+ * 4. 如果右树为空，我们深层遍历计算左树
+ * 5. 直到两树都为空的情况下，我们去两树的最小值 + 1
+ */
+
+
+
+ // 977. 有序数组的平方
+
+var sortedSquares = function (A) {
+    return A.map(res => {return res * res}).sort((a, b) => { return a - b })
+};
+
+// console.log(sortedSquares([-4, -1, 0, 3, 10]))
+
+/**
+ * 解题思路：
+ * 
+ * 1. 先计算数组每一项的平方，在将数组进行排序
+ */
+
+
+
+ // 728. 自除数
+var selfDividingNumbers = function (left, right) {
+    let arr = []
+    
+    for(let i = left; i <= right; i++) {
+        if (i < 10) {
+            arr.push(i)
+        } else if(i > 10){
+            let n = i.toString()
+            let flag = true
+            for (let j = 0; j < n.length; j++) {
+                if (i % n[j] != 0) {
+                    flag = false
+                }
+            }
+            if (flag) {
+                arr.push(i)
+            }
+        }
+    }
+    return [...arr]
+};
+
+
+// console.log(selfDividingNumbers(1, 22))
+
+/**
+ * 解题思路：
+ * 
+ * 1. 根据题意【题中给定上边界和下边界数字，计算这两边界中（含边界）的自然数（自除数 是指可以被它包含的每一位数除尽的数。）】
+ * 2. 因此可以想象出，小于10的都是自然数，我们只需要i计算出大于10的自然数
+ * 3. 将大于10（自除数不允许包含 0 ）转换成字符串，遍历，如果有一项被除不尽，则舍弃，否则添加到数组中
+ */
+
+
+
+ // 292. Nim 游戏
+var canWinNim = function (n) {
+    return n % 4 === 0 ? false : true
+};
+
+// console.log(canWinNim(2))
+
+
+/**
+ * 从题意中得知，你拿4的倍数，必输
+ */
+
+
+// 852. 山脉数组的峰顶索引
+var peakIndexInMountainArray = function (A) {
+    let max = Math.max.apply(null, A)
+    for(let i = 0; i < A.length; i++) {
+        if (A[i] === max) {
+            return i
+        }
+    }
+};
+
+
+// console.log(peakIndexInMountainArray([8, 1, 0]))
+
+
+// 476. 数字的补数
+var findComplement = function (num) {
+    let kut = num.toString(2)
+    let l = ''
+    for (let i = 0; i < kut.length; i++) {
+        if(kut[i] == 1) {
+            l += 0
+        } else {
+            l += 1
+        }
+    }
+    return parseInt(l, 2)
+};
+
+// console.log(findComplement(1))
+
+
+// 905. 按奇偶排序数组
+var sortArrayByParity = function (A) {
+    let Odd = []
+    let Even = []
+    for(let i = 0; i < A.length; i++) {
+        if (A[i] % 2 == 0 ){
+            Even.push(A[i])
+        } else {
+            Odd.push(A[i])
+        }
+    }
+    return [...Even, ...Odd]
+};
+
+// console.log(sortArrayByParity([3, 1, 2, 4]))
+
+
+
+var reverseString = function (s) {
+    for(let i = 0; i < s.length; i++) {
+        if (i >= Math.ceil(s.length / 2)) return s
+        let str1 = s[i]
+        let str2 = s[(s.length - 1) - i]
+        s[i] = str2
+        s[s.length - 1 - i] = str1
+    }
+    return s
+};
+
+// console.log(reverseString(["h", "e", "l", "l", "o", "o", "o", "o"]))
+
+/**
+ * 解题思路：
+ * 
+ * 1. 由题意得知，反转数组。。。。
+ * 2. 自然不能使用reverse
+ * 3. 但是题目规定不能使用新的内存地址，因此我们不可以建立一个新的数组，也没必要建立其他的内存地址
+ * 4. 所以我们只在原数组中操作
+ * 5. 每次保存前位与后位相对应的值
+ * 6. 进行一次交换，依次循环，但是我们不能让他一直循环下去，得将循环次数卡到数组的一半长度，否则做无用功
+ */
+
+
+// 557. 反转字符串中的单词 III
+var reverseWords = function (s) {
+    let Result = ''
+    let arr = s.split(' ')
+    let count = 0
+    function reverseString(s) {
+        for (let i = 0; i < s.length; i++) {
+            if (i >= Math.ceil(s.length / 2)) return s
+            let str1 = s[i]
+            let str2 = s[(s.length - 1) - i]
+            s[i] = str2
+            s[s.length - 1 - i] = str1
+        }
+        return s
+    };
+    for( let i = 0; i < arr.length; i++) {
+        count++
+        let str = ''
+        reverseString(arr[i].split('')).forEach(res => {
+            str += res
+        })
+        if (count <= arr.length) {
+            Result += str + ' '
+        } else {
+            Result += str
+        }
+        
+    }
+
+    return Result
+};
+
+console.log(reverseWords("Let's take LeetCode contest"))
+
+
+/**
+ * 解题思路：
+ * 
+ * 1. 又是一道反转，只是和以前的反转数组有点不同，这回是反转字符串内的每一个单词中的每一个字母
+ * 2. 因此我们还是拒绝使用reverse这么厉害又方遍的函数。。。。。。
+ * 3. 先将字符串分割，转化成数组，在拿到数组中的 每一项进行反转
+ * 4. 再将字符串按格式拼接起来
+ */
