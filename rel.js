@@ -1266,7 +1266,7 @@ var minTimeToVisitAllPoints = function (points) {
     return result;
 };
 
-console.log(minTimeToVisitAllPoints(options))
+// console.log(minTimeToVisitAllPoints(options))
 
 
 // 1 - 3 = -2 = 2
@@ -1275,4 +1275,308 @@ console.log(minTimeToVisitAllPoints(options))
 
 // 1 - 4 = -3 = 3
 // 4 - 0 = 4 = 4
+
+
+
+const a = [
+  { a: 1, n: 2, id: 1 },
+  { a: 123, n: 12, id: 12 },
+  { a: 2, n: 42, id: 122 },
+  { a: 4, n: 22, id: 21 },
+];
+const b = [
+  { c: 12, d: 2, id: 1 },
+  { c: 1123, d: 12, id: 12 },
+  { c: 2, d: 42, id: 122 },
+  { c: 4, d: 22, id: 21 },
+    { c: 5, d: 22, id: 21 },
+];
+
+const result = [
+  { a: 1, n: 2, id: 1, fileName: 1 },
+  { a: 123, n: 12, id: 12, fileName: 123 },
+  { a: 2, n: 42, id: 122, fileName: 2 },
+  { a: 4, n: 22, id: 21, fileName: 4 },
+];
+
+// 给数组a 加个属性，值是b的id跟a一样的c
+
+function addRsukt(aint) {
+    let len = a.length;
+    let bint = 0;
+    if (aint < len){
+        const other = (val) => {
+            let lesn = b.length;
+            if (bint < lesn) {
+                if (b[bint]['c'] == val) {
+                    return true
+                } else {
+                    bint++
+                    other(val)
+                }
+            } else {
+                return false
+            }
+            
+        }
+        other(a[aint]['a'])
+        if (other(a[aint]['a'])) {
+            a[aint] = {
+                ...a[aint],
+                fileName: a[aint]['a']
+            }
+        } else {
+            a[aint] = {
+                ...a[aint],
+                fileName: ''
+            }
+        }
+        addRsukt(aint + 1)
+    }
+    
+}
+addRsukt(0)
+
+// console.log(a)
+
+// new Promise((resolve, reject) => {
+//     resolve()
+// }).then(res => {
+//     console.log(1111)
+// }).then(res => {
+//     console.log(222)
+// }).resolve(res => {
+//     console.log(111)
+// })
+
+// class Promiser {
+//     // resolve
+//     then() {
+
+//     }
+// }
+const PENDING = 'pending';
+const FULFILLED = 'fulfilled';
+const REJECTED = 'rejected';
+
+function Promiser(Foreign) {
+    let successFul = []
+    let failFul = []
+    let result = undefined
+    let self = this
+    self.state = PENDING
+    function resolve(val) {
+        if (self.state != PENDING) return;
+        setTimeout(() => {
+            self.state = FULFILLED
+            result = val
+            successFul.forEach(item => {
+                item(val)
+            })
+        })
+    }
+    function reject(val) {
+        if (self.state != PENDING) return;
+        setTimeout(() => {
+            self.state = REJECTED
+            result = val
+            failFul.forEach(item => {
+                item(val)
+            })
+        })
+    }
+    self.then = function (fulfilledCallBack, rejectedCallBack) {
+        typeof fulfilledCallBack !== 'function' ? fulfilledCallBack = result => result : null;
+        typeof rejectedCallBack !== 'function' ? rejectedCallBack = result => {
+            throw new Error(result instanceof Error ? result.message : result)
+        } : null
+        return new Promiser((resolve, reject) => {
+            successFul.push(() => {
+                try{
+                    let x = fulfilledCallBack(result)
+                    x instanceof Promiser ? x.then(resolve, reject) : resolve(x)
+                }catch(err){
+                    reject(err)
+                }
+            })
+            failFul.push(() => {
+                try {
+                    let x = rejectedCallBack(result)
+                    x instanceof Promiser ? x.then(resolve, reject) : resolve(x)
+                } catch (err) {
+                    reject(err)
+                }
+            })
+        })
+    }
+
+    self.catch = function (rejectedCallBack) {
+        return self.then(null, rejectedCallBack)
+    }
+
+    self.all = function (promiseArray = []) {
+        let index = 0;
+        let result = []
+        return new Promiser((resolve, reject) => {
+            for (let i = 0; i < promiseArray.length; i++) {
+                promiseArray[i].then(res => {
+                    index++;
+                    result[i] = res
+                    if (index == promiseArray.length) {
+                        resolve(result)
+                    }
+                }, reject)
+            }
+        })
+    }
+    
+    try{
+        Foreign(resolve, reject)
+    } catch(e) {
+        reject(e)
+    }
+    
+}
+
+
+
+// new Promiser((resolve, reject) => {
+//     console.log(resolve(100))
+//     console.log(111)
+//     setTimeout(() => {
+//         Math.random() < 0.5 ? resolve(100) : reject(-100);
+//     }, 1000)
+// }).then(res => {
+//     console.log(res, 'succ');
+// }, err => {
+//     console.log(err, 'err');
+// }).then(res => {
+//     console.log(1111)
+// })
+
+// console.log(Promiser.all())
+
+let p1 = new Promiser((resolve, reject) => {
+    resolve(() => {
+        console.log(111)
+    })
+    // setTimeout(() => {
+    //     Math.random() < 0.5 ? resolve('第一次成功') : reject('第一次失败');
+    // }, 1000)
+})
+
+let p2 = new Promiser((resolve, reject) => {
+    resolve('第二次成功')
+    // setTimeout(() => {
+    //     Math.random() < 0.1 ? resolve('第二次成功') : reject('第二次失败');
+    // }, 1000)
+})
+
+// new Promiser().all([p1, p2]).then(res => {
+//     console.log(res, '对的')
+//     console.log('..........')
+//     res.forEach(item => {
+//         if (typeof item == 'function'){
+//             item()
+//         }else {
+//             console.log(item)
+//         }
+//     })
+// }, err => {
+//     console.log(err, '错啦')
+// })
+// new Promiser((resolve, reject) => {
+
+// })
+
+// 9. 回文数
+
+
+var isPalindrome = function (x) {
+    // return x.toString().split('').reverse().join('') == x
+    let t = 0
+    if (x < 0) {
+        return false;
+    }
+    if (x < 10) {
+        return true;
+    }
+    if (x % 10 == 0) {
+        return false;
+    }
+    let o = x
+    while (x > 0) {
+        t = t * 10 + x % 10;
+        x = parseInt(x / 10);
+    }
+    return t == o
+};
+
+// console.log(isPalindrome(121))
+
+
+// 给一个数字，返回反转以后得数字 例：123 => 321 // 注: 不允许使用字符串方法
+
+let strArr = ["c", "acc", "ccc"]
+// 14. 最长公共前缀
+
+var longestCommonPrefix = function (strs) {
+    if (strs.length == 1) return strs[0]
+    if (strs.length == 0) return ''
+    let arr = [];
+    strs.forEach(item => {
+        arr.push(item.split(''))
+    })
+    let lenarr = []
+    arr.forEach(item => {
+        lenarr.push(item.length)
+    })
+    let min = lenarr.sort((x, y) => x - y)[0]
+    let resukt = []
+    for (let i = 0; i < arr.length; i++) {
+        let str = []
+        let s = i + 1
+        if (s < arr.length) {
+            for (let j = 0; j < min; j++) {
+                if (arr[0][0] != arr[s][0]) {
+                    resukt = []
+                    return ''
+                }
+                if (arr[0][j] == arr[s][j]) {
+                    str.push(arr[0][j])
+                } else {
+                    resukt = []
+                }
+            }   
+            if (str.length) {
+                resukt.push(str)
+            }
+            
+        }
+        
+        
+        
+    }
+    if (resukt.length) {
+        let i = resukt.sort((x, y) => x.length - y.length)
+        return i[0].join('')
+    } else {
+        return ''
+    }
+    
+
+};
+// 
+// console.log(longestCommonPrefix(strArr))
+
+
+//26. 删除排序数组中的重复项
+
+let nums = [1, 1, 2]
+var removeDuplicates = function (nums) {
+    console.log()
+    return Array.from(new Set(nums))
+};
+
+console.log(removeDuplicates(nums))
 
