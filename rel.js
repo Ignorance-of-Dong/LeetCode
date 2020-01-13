@@ -1572,11 +1572,43 @@ var longestCommonPrefix = function (strs) {
 
 //26. 删除排序数组中的重复项
 
-let nums = [1, 1, 2]
+let nums = [0, 0, 1, 1, 1, 2, 2, 3, 3, 4]
+
+// 0 0 false 1
+// 1 0 true  2 [0, 1, 1, 1, 1, 2, 2, 3, 3, 4] 1
+// 1 1 false 3
+// 1 1 false 4
+// 2 1 true  5 [0, 1, 2, 1, 1, 2, 2, 3, 3, 4] 2
+// 2 2 false 6 
+// 3 2 true  7 [0, 1, 2, 3, 1, 2, 2, 3, 3, 4] 3
+// 3 2 true  8 
+
 var removeDuplicates = function (nums) {
-    console.log()
-    return Array.from(new Set(nums))
+    let j = 1
+    for(let i = 1; i < nums.length; i++) {
+        if (nums[i] != nums[i - 1]) {
+            nums[j++] = nums[i] 
+        }
+    }
+    return j
 };
 
-console.log(removeDuplicates(nums))
+// console.log(removeDuplicates(nums))
+
+var removeElement = function (nums, val) {
+    if (!nums.length) return 0
+    let len = 0
+    for(let i = 0; i < nums.length; i++) {
+        if (nums[i] == val) {
+            nums[len] = nums[i]
+            len++
+        }
+    }
+    
+    return len
+};
+
+let numss = [0, 1, 2, 2, 3, 0, 4, 2], val = 2
+
+console.log(removeElement(numss, val))
 
